@@ -1,0 +1,8 @@
+{
+    "ssid" : "",
+    "password" : "",
+    "record":true,
+    "record_icon":true,
+    "show_camera":false,
+    "face_timeout_s": 10
+}
