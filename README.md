@@ -98,7 +98,7 @@ Create a file named `config.json` with the following content:
 3. Clone this repository:
 
    ```bash
-   git clone https://github.com/<your-repo>/M5Stack-WebCam.git
+   git clone https://github.com/griffithsb/M5Stack-WebCam/M5Stack-WebCam.git
    ```
 
 4. Open the project folder in VS Code.
