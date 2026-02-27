@@ -16,7 +16,7 @@
     "\"password\":\"<your-pass>\",\n" \
     "\"record\":true,\n" \
     "\"record_icon\":true,\n" \
-    "\"show_camera\":false}\n" \
+    "\"show_camera\":false,\n" \
     "\"face_timeout_s\":10}\""
 
 void Webcam::begin()
@@ -193,16 +193,16 @@ void Webcam::updateRecIndicator()
     static uint32_t lastToggle = 0;
     static bool visible = true;
 
-    if (millis() - lastToggle >= 500) {
+    if (millis() - lastToggle >= 1000) {
         lastToggle = millis();
         visible = !visible;
+    }
 
-        if (visible) {
-            M5.Display.setCursor(0,0);
-            M5.Display.print("R");
-        } else {
-            M5.Display.setCursor(0,0);
-            M5.Display.print(" ");
-        }
+    if (visible) {
+        M5.Display.setCursor(0,0);
+        M5.Display.print("R");
+    } else {
+        M5.Display.setCursor(0,0);
+        M5.Display.print(" ");
     }
 }

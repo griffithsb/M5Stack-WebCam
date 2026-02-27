@@ -1,12 +1,11 @@
 #include "Camera.h"
-#include "model_zoo/human_face_detect_msr01.hpp"
 
 Camera& Camera::getInstance() {
     static Camera instance;
     return instance;
 }
 
-Camera::Camera(): display(), canvas(&display), _config(Config::getInstance()) {}
+Camera::Camera(): display(), canvas(&display), _config(Config::getInstance()), face_detector(0.1f, 0.2f, 10, 0.3f) {}
 
 void Camera::setup()
 {
@@ -58,8 +57,7 @@ void Camera::faceDetect(camera_fb_t * fb)
 {
         int x, y, w, h;
 
-        HumanFaceDetectMSR01 s1(0.3F, 0.5F, 1, 0.5F);
-        std::list<dl::detect::result_t> &results = s1.infer((uint16_t *)fb->buf, {(int)fb->height, (int)fb->width, 3});
+        std::list<dl::detect::result_t> &results = face_detector.infer((uint16_t *)fb->buf, {(int)fb->height, (int)fb->width, 3});
 
         face_cnt = results.size();
 

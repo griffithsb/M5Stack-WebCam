@@ -46,7 +46,7 @@ This project is built using **PlatformIO**. The following libraries are required
 6. **DNSServer**
    DNS server library (commonly used for captive portal implementations).
 
-Note: AviWriter is adapted from https://github.com/s60sc/ESP32-CAM_MJPEG2SD
+> **Note:** AviWriter is adapted from https://github.com/s60sc/ESP32-CAM_MJPEG2SD
 ---
 
 ## 🚀 Installation

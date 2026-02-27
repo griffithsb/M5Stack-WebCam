@@ -26,4 +26,6 @@ public:
 
 private:
     Config();
+    template<typename T>
+    bool readValue(const JsonDocument& doc, const char* key, T& out);
 };
