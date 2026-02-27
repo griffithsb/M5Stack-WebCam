@@ -7,7 +7,7 @@ Camera& Camera::getInstance() {
 
 const int OFFSET_FOR_RECORD_INDICATOR = 20;
 
-Camera::Camera(): m_display(), m_canvas(&m_display), m_config(Config::getInstance()), face_detector(0.1f, 0.2f, 10, 0.3f) {}
+Camera::Camera(): m_display(), m_canvas(&m_display), m_config(Config::getInstance()), face_detector(0.2f, 0.3f, 2, 0.3f) {}
 
 void Camera::setup()
 {

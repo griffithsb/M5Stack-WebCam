@@ -2,6 +2,8 @@
 
 A WebCam for the M5Stack CoreS3 with browser streaming, face recognition triggered recording to SD.
 
+![M5Stack-WebCam](preview.png)
+
 ## ✨ Features
 
 * **Face Detection:**
