@@ -33,7 +33,7 @@ public:
   void abort();
 
   // Stats
-  uint16_t frameCount() const { return _frameCnt; }
+  uint16_t frameCount() const { return m_frameCnt; }
 
 private:
 
@@ -53,24 +53,24 @@ private:
 
   bool ensureIndexAlloc();
 
-  fs::FS* _fs = nullptr;
-  File _file;
+  fs::FS* m_fs = nullptr;
+  File m_file;
 
-  uint8_t _frameType = 0;
-  uint8_t _targetFps = 0;
-  uint16_t _frameCnt = 0;
-  uint32_t _startMs = 0;
+  uint8_t m_frameType = 0;
+  uint8_t m_targetFps = 0;
+  uint16_t m_frameCnt = 0;
+  uint32_t m_startMs = 0;
 
   // Index buffer / counters
-  uint32_t _maxFrames = 0;
-  uint8_t* _idxBuf = nullptr;
-  size_t _idxPtr = 0;
-  size_t _idxOffset = 0;
-  size_t _moviSize = 0;
-  size_t _indexLen = 0;
+  uint32_t m_maxFrames = 0;
+  uint8_t* m_idxBuf = nullptr;
+  size_t m_idxPtr = 0;
+  size_t m_idxOffset = 0;
+  size_t m_moviSize = 0;
+  size_t m_indexLen = 0;
 
   // AVI header template (patched at end)
-  uint8_t _aviHeader[AVI_HEADER_LEN];
+  uint8_t m_aviHeader[AVI_HEADER_LEN];
 
   // Constants
   static const uint8_t DC_BUF[4];   // "00dc"

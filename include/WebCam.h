@@ -29,16 +29,16 @@ private:
     static void handleIndex(AsyncWebServerRequest *request);
 
 private:
-    AsyncWebServer server{80};
-    EspFileManager fileManager;
-    AviWriter aviWriter;
+    AsyncWebServer m_server{80};
+    EspFileManager m_fileManager;
+    AviWriter m_aviWriter;
 
     char filename[FILENAME_MAX_LEN];
 
-    Config& config = Config::getInstance();
-    Camera& camera = Camera::getInstance();
+    Config& m_config = Config::getInstance();
+    Camera& m_camera = Camera::getInstance();
 
-    bool recording = false;
-    uint32_t no_faces_start = 0;
-    uint32_t face_present_start = 0;
+    bool m_recording = false;
+    uint32_t m_noFacesStart = 0;
+    uint32_t m_facePresentStart = 0;
 };

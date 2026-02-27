@@ -19,20 +19,20 @@ AsyncJpegStreamResponse::AsyncJpegStreamResponse() {
     _contentType = STREAM_CONTENT_TYPE;
     _sendContentLength = false;
     _chunked = true;
-    _index = 0;
-    lastAsyncRequest = 0;
-    first = true;
-    _frame_index = 0;
+    m_index = 0;
+    m_lastAsyncRequest = 0;
+    m_first = true;
+    m_frameIndex = 0;
 }
 
-bool AsyncJpegStreamResponse::_sourceValid() const {
+bool AsyncJpegStreamResponse::sourceValid() const {
     return true;
 }
 
-size_t AsyncJpegStreamResponse::_fillBuffer(uint8_t *buf, size_t maxLen) {
-    size_t ret = _content(buf, maxLen, _index);
+size_t AsyncJpegStreamResponse::fillBuffer(uint8_t *buf, size_t maxLen) {
+    size_t ret = _content(buf, maxLen, m_index);
     if (ret != RESPONSE_TRY_AGAIN) {
-        _index += ret;
+        m_index += ret;
     }
     return ret;
 }
@@ -40,12 +40,12 @@ size_t AsyncJpegStreamResponse::_fillBuffer(uint8_t *buf, size_t maxLen) {
 size_t AsyncJpegStreamResponse::_content(uint8_t *buffer, size_t maxLen, size_t index) {
     Camera& camera = Camera::getInstance();
 
-    if (first || _frame_index == _jpg_len_copy) {
-        first = false;
+    if (m_first || m_frameIndex == m_jpgLenCopy) {
+        m_first = false;
 
         if (index) {
             uint64_t end = (uint64_t)micros();
-            lastAsyncRequest = end;
+            m_lastAsyncRequest = end;
         }
 
         if (maxLen < (strlen(STREAM_BOUNDARY) +
@@ -54,8 +54,8 @@ size_t AsyncJpegStreamResponse::_content(uint8_t *buffer, size_t maxLen, size_t 
             return RESPONSE_TRY_AGAIN;
         }
 
-        _frame_index = 0;
-        camera.getJpegFrameCopy(_jpg_buf_copy, &_jpg_len_copy);
+        m_frameIndex = 0;
+        camera.getJpegFrameCopy(m_jpgBufCopy, &m_jpgLenCopy);
 
         // Send boundary
         size_t blen = 0;
@@ -67,30 +67,30 @@ size_t AsyncJpegStreamResponse::_content(uint8_t *buffer, size_t maxLen, size_t 
 
         // Send header
         size_t hlen = sprintf((char *)buffer, STREAM_PART,
-                              JPG_CONTENT_TYPE, _jpg_len_copy);
+                              JPG_CONTENT_TYPE, m_jpgLenCopy);
         buffer += hlen;
 
         // Send frame chunk
         hlen = maxLen - hlen - blen;
-        if (hlen > _jpg_len_copy) {
-            maxLen -= hlen - _jpg_len_copy;
-            hlen = _jpg_len_copy;
+        if (hlen > m_jpgLenCopy) {
+            maxLen -= hlen - m_jpgLenCopy;
+            hlen = m_jpgLenCopy;
         }
 
-        memcpy(buffer, _jpg_buf_copy, hlen);
-        _frame_index += hlen;
+        memcpy(buffer, m_jpgBufCopy, hlen);
+        m_frameIndex += hlen;
 
         return maxLen;
     }
 
     // Continue sending frame
-    size_t available = _jpg_len_copy - _frame_index;
+    size_t available = m_jpgLenCopy - m_frameIndex;
     if (maxLen > available) {
         maxLen = available;
     }
 
-    memcpy(buffer, _jpg_buf_copy + _frame_index, maxLen);
-    _frame_index += maxLen;
+    memcpy(buffer, m_jpgBufCopy + m_frameIndex, maxLen);
+    m_frameIndex += maxLen;
 
     return maxLen;
 }

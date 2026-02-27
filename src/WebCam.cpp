@@ -27,21 +27,21 @@ void Webcam::begin()
     SD.begin(SD_SPI_CS_PIN, SPI, 25000000);
     M5.Lcd.setTextSize(2);
 
-    if(!config.loadConfig()) {
+    if(!m_config.loadConfig()) {
         M5.Display.printf(HELP_STRING);
         while(1) delay(1);
     }
 
-    camera.setup();
+    m_camera.setup();
 
-    if(config.ssid != "") {
+    if(m_config.m_ssid != "") {
         setupWiFi();
         setupServer();
     }
 
     M5.Display.clear(TFT_BLACK);
-    if(!config.show_camera) M5.Lcd.setBrightness(0);
-    M5.Display.setTextColor(TFT_RED);
+    if(!m_config.m_showCamera) M5.Lcd.setBrightness(0);
+    M5.Display.setTextColor(TFT_RED, TFT_BLACK);
 }
 
 void Webcam::setupWiFi()
@@ -50,7 +50,7 @@ void Webcam::setupWiFi()
 
     WiFi.mode(WIFI_STA);
     WiFi.disconnect();
-    WiFi.begin(config.ssid.c_str(), config.password.c_str());
+    WiFi.begin(m_config.m_ssid.c_str(), m_config.m_password.c_str());
     WiFi.setSleep(false);
 
     M5.Display.printf("\nWiFi:");
@@ -82,13 +82,13 @@ void Webcam::setupWiFi()
 
 void Webcam::setupServer()
 {
-    fileManager.initSDCard(&SD, SD_SPI_CS_PIN);
-    fileManager.setServer(&server);
+    m_fileManager.initSDCard(&SD, SD_SPI_CS_PIN);
+    m_fileManager.setServer(&m_server);
 
-    server.on("/", HTTP_GET, handleIndex);
-    server.on("/stream", HTTP_GET, handleStream);
+    m_server.on("/", HTTP_GET, handleIndex);
+    m_server.on("/stream", HTTP_GET, handleStream);
 
-    server.begin();
+    m_server.begin();
 }
 
 void Webcam::handleStream(AsyncWebServerRequest *request)
@@ -124,9 +124,9 @@ void Webcam::handleIndex(AsyncWebServerRequest *request)
 
 void Webcam::update()
 {
-    camera.update();
+    m_camera.update();
 
-    if(config.record) {
+    if(m_config.m_record) {
         updateRecording();
     }
 }
@@ -136,11 +136,11 @@ void Webcam::updateRecording()
     const uint32_t START_DELAY_MS = 250;
 
     // START recording when face present
-    if (!recording) {
-        if (camera.face_cnt > 0) {
-            if (face_present_start == 0)
-                face_present_start = millis();
-            else if (millis() - face_present_start >= START_DELAY_MS) {
+    if (!m_recording) {
+        if (m_camera.m_faceCnt > 0) {
+            if (m_facePresentStart == 0)
+                m_facePresentStart = millis();
+            else if (millis() - m_facePresentStart >= START_DELAY_MS) {
 
                 auto dt = M5.Rtc.getDateTime();
 
@@ -149,42 +149,44 @@ void Webcam::updateRecording()
                     dt.date.date, dt.date.month, dt.date.year,
                     dt.time.hours, dt.time.minutes, dt.time.seconds);
 
-                aviWriter.begin(SD, filename, FRAMESIZE_QVGA, 15);
+                m_aviWriter.begin(SD, filename, FRAMESIZE_QVGA, 15);
 
-                recording = true;
-                no_faces_start = 0;
-                face_present_start = 0;
+                m_recording = true;
+                m_noFacesStart = 0;
+                m_facePresentStart = 0;
 
-                M5.Lcd.setBrightness(config.show_camera ? 100 : 50);
+                M5.Lcd.setBrightness(m_config.m_showCamera ? 100 : 50);
             }
         } else {
-            face_present_start = 0;
+            m_facePresentStart = 0;
         }
     }
 
     // STOP recording when no faces
-    if (recording) {
-        if(config.record_icon) updateRecIndicator();
+    if (m_recording) {
+        if(m_config.m_recordIcon) updateRecIndicator();
 
-        if (camera.face_cnt == 0) {
-            if (no_faces_start == 0)
-                no_faces_start = millis();
-            else if (millis() - no_faces_start >=
-                     config.face_timeout_s * 1000) {
+        if (m_camera.m_faceCnt == 0) {
+            if (m_noFacesStart == 0)
+                m_noFacesStart = millis();
+            else if (millis() - m_noFacesStart >=
+                     m_config.m_faceTimeout * 1000) {
 
-                aviWriter.end();
-                recording = false;
-                no_faces_start = 0;
-                face_present_start = 0;
+                m_aviWriter.end();
+                m_recording = false;
+                m_noFacesStart = 0;
+                m_facePresentStart = 0;
 
-                if(!config.show_camera) M5.Lcd.setBrightness(0);
+                if(!m_config.m_showCamera) M5.Lcd.setBrightness(0);
+                M5.Display.setCursor(0,0);
+                M5.Display.print(" ");
                 return;
             }
         } else {
-            no_faces_start = 0;
+            m_noFacesStart = 0;
         }
 
-        aviWriter.addJpegFrame(camera.jpg_buf, camera.jpg_buf_len);
+        m_aviWriter.addJpegFrame(m_camera.m_jpgBug, m_camera.m_jpgBufLen);
     }
 }
 

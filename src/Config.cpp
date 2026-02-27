@@ -5,12 +5,12 @@ Config& Config::getInstance() {
     return instance;
 }
 
-Config::Config() :  ssid(""),
-                    password(""),
-                    record(true),
-                    record_icon(true),
-                    show_camera(false),
-                    face_timeout_s(10)
+Config::Config() :  m_ssid(""),
+                    m_password(""),
+                    m_record(true),
+                    m_recordIcon(true),
+                    m_showCamera(false),
+                    m_faceTimeout(10)
                     {}
 
 template<typename T>
@@ -38,11 +38,12 @@ bool Config::loadConfig() {
     DeserializationError error = deserializeJson(doc, json);
     if (error) return false;
 
-    readValue(doc ,"ssid", ssid);
-    readValue(doc ,"password", password);
-    readValue(doc ,"record", record);
-    readValue(doc ,"record_icon", record_icon);
-    readValue(doc ,"show_camera", show_camera);
-    readValue(doc ,"face_timeout_s", face_timeout_s);
+    readValue(doc ,"ssid", m_ssid);
+    readValue(doc ,"password", m_password);
+    readValue(doc ,"record", m_record);
+    readValue(doc ,"record_icon", m_recordIcon);
+    readValue(doc ,"show_camera", m_showCamera);
+    readValue(doc ,"face_timeout_s", m_faceTimeout);
+
     return true;
 }

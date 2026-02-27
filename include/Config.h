@@ -16,13 +16,13 @@ public:
 
     bool loadConfig();
 
-    std::string ssid;
-    std::string password;
+    std::string m_ssid;
+    std::string m_password;
 
-    bool record;
-    bool record_icon;
-    bool show_camera;
-    int face_timeout_s;
+    bool m_record;
+    bool m_recordIcon;
+    bool m_showCamera;
+    int m_faceTimeout;
 
 private:
     Config();

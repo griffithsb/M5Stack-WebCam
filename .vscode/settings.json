@@ -1,0 +1,13 @@
+{
+  "C_Cpp.files.exclude": {
+    "**/.pio/": true
+  },
+  "C_Cpp.exclusionPolicy": "checkFilesAndFolders",
+
+  "search.exclude": {
+    "**/.pio/**": true
+  },
+  "files.watcherExclude": {
+    "**/.pio/**": true
+  }
+}

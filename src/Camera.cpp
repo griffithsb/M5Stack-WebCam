@@ -5,7 +5,9 @@ Camera& Camera::getInstance() {
     return instance;
 }
 
-Camera::Camera(): display(), canvas(&display), _config(Config::getInstance()), face_detector(0.1f, 0.2f, 10, 0.3f) {}
+const int OFFSET_FOR_RECORD_INDICATOR = 20;
+
+Camera::Camera(): m_display(), m_canvas(&m_display), m_config(Config::getInstance()), face_detector(0.1f, 0.2f, 10, 0.3f) {}
 
 void Camera::setup()
 {
@@ -42,10 +44,10 @@ void Camera::setup()
     };
 
     esp_camera_init(&_camera_config);
-    display.begin();
-    canvas.createSprite(320, 240); //FRAMESIZE_QVGA // 320 x 240.
-    canvas.setColor(TFT_GREEN);
-    mutex = xSemaphoreCreateMutex();
+    m_display.begin();
+    m_canvas.createSprite(320, 240); //FRAMESIZE_QVGA // 320 x 240.
+    m_canvas.setColor(TFT_GREEN);
+    m_mutex = xSemaphoreCreateMutex();
 
     sensor_t* s = esp_camera_sensor_get();
     s->set_hmirror(s, 0);
@@ -59,8 +61,7 @@ void Camera::faceDetect(camera_fb_t * fb)
 
         std::list<dl::detect::result_t> &results = face_detector.infer((uint16_t *)fb->buf, {(int)fb->height, (int)fb->width, 3});
 
-        face_cnt = results.size();
-
+        m_faceCnt = results.size();
 
         for (std::list<dl::detect::result_t>::iterator prediction = results.begin(); prediction != results.end(); prediction++)
         {
@@ -68,16 +69,16 @@ void Camera::faceDetect(camera_fb_t * fb)
             y = (int)prediction->box[1];
             w = (int)prediction->box[2] - x + 1;
             h = (int)prediction->box[3] - y + 1;
-            canvas.drawRect(x, y, w, h);
+            m_canvas.drawRect(x, y, w, h);
         }
 }
 
 bool Camera::getJpegFrame(uint8_t ** jpg_buf, size_t * jpg_len) {
     return fmt2jpg(
-        (uint8_t*)canvas.getBuffer(),
-        canvas.width() * canvas.height() * 2,  // buffer length (RGB565 = 2 bytes/pixel)
-        canvas.width(),
-        canvas.height(),
+        (uint8_t*)m_canvas.getBuffer(),
+        m_canvas.width() * m_canvas.height() * 2,  // buffer length (RGB565 = 2 bytes/pixel)
+        m_canvas.width(),
+        m_canvas.height(),
         PIXFORMAT_RGB565,
         80, // JPEG quality (0–100)
         jpg_buf,
@@ -87,11 +88,11 @@ bool Camera::getJpegFrame(uint8_t ** jpg_buf, size_t * jpg_len) {
 
 void Camera::getJpegFrameCopy(uint8_t *jpg_buf_copy, size_t * jpg_len_copy)
 {
-    if (xSemaphoreTake(mutex, portMAX_DELAY) == pdTRUE)
+    if (xSemaphoreTake(m_mutex, portMAX_DELAY) == pdTRUE)
     {
-        memcpy(jpg_buf_copy, jpg_buf, jpg_buf_len);
-        *jpg_len_copy = jpg_buf_len;
-        xSemaphoreGive(mutex);
+        memcpy(jpg_buf_copy, m_jpgBug, m_jpgBufLen);
+        *jpg_len_copy = m_jpgBufLen;
+        xSemaphoreGive(m_mutex);
     }
 }
 
@@ -99,20 +100,20 @@ void Camera::update()
 {
     camera_fb_t* fb = esp_camera_fb_get();
 
-    canvas.pushImage(0, 0, fb->width, fb->height, (uint16_t *)fb->buf);
+    m_canvas.pushImage(0, 0, fb->width, fb->height, (uint16_t *)fb->buf);
 
     faceDetect(fb);
 
-    if(_config.show_camera) canvas.pushSprite(&M5.Display, 0, 0);
+    if(m_config.m_showCamera) m_canvas.pushSprite(&M5.Display, 0, OFFSET_FOR_RECORD_INDICATOR);
 
-    if (xSemaphoreTake(mutex, portMAX_DELAY) == pdTRUE)
+    if (xSemaphoreTake(m_mutex, portMAX_DELAY) == pdTRUE)
     {
-        if(jpg_buf != NULL) {
-            free(jpg_buf);
-            jpg_buf = NULL;
+        if(m_jpgBug != NULL) {
+            free(m_jpgBug);
+            m_jpgBug = NULL;
         }
-        getJpegFrame(&jpg_buf, &jpg_buf_len);
-        xSemaphoreGive(mutex);
+        getJpegFrame(&m_jpgBug, &m_jpgBufLen);
+        xSemaphoreGive(m_mutex);
     }
 
     esp_camera_fb_return(fb);
