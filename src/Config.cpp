@@ -33,7 +33,7 @@ Config::Config() :  ssid(""),
                     face_timeout_s(10)
                     {}
 
-bool Config::load_config() {
+bool Config::loadConfig() {
     FILE* file = std::fopen(CONFIG_FILE_NAME, "rb");
     if (!file) return false;
 

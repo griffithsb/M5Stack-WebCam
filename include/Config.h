@@ -14,7 +14,7 @@ public:
     Config(const Config&) = delete;
     Config& operator=(const Config&) = delete;
 
-    bool load_config();
+    bool loadConfig();
 
     std::string ssid;
     std::string password;

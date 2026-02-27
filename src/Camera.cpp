@@ -47,9 +47,14 @@ void Camera::setup()
     canvas.createSprite(320, 240); //FRAMESIZE_QVGA // 320 x 240.
     canvas.setColor(TFT_GREEN);
     mutex = xSemaphoreCreateMutex();
+
+    sensor_t* s = esp_camera_sensor_get();
+    s->set_hmirror(s, 0);
+    s->set_brightness(s, 1);
+    s->set_saturation(s, -2);
 }
 
-void Camera::face_detect(camera_fb_t * fb)
+void Camera::faceDetect(camera_fb_t * fb)
 {
         int x, y, w, h;
 
@@ -69,7 +74,7 @@ void Camera::face_detect(camera_fb_t * fb)
         }
 }
 
-bool Camera::get_jpeg_frame(uint8_t ** jpg_buf, size_t * jpg_len) {
+bool Camera::getJpegFrame(uint8_t ** jpg_buf, size_t * jpg_len) {
     return fmt2jpg(
         (uint8_t*)canvas.getBuffer(),
         canvas.width() * canvas.height() * 2,  // buffer length (RGB565 = 2 bytes/pixel)
@@ -82,7 +87,7 @@ bool Camera::get_jpeg_frame(uint8_t ** jpg_buf, size_t * jpg_len) {
     );
 }
 
-void Camera::get_jpeg_frame_copy(uint8_t *jpg_buf_copy, size_t * jpg_len_copy)
+void Camera::getJpegFrameCopy(uint8_t *jpg_buf_copy, size_t * jpg_len_copy)
 {
     if (xSemaphoreTake(mutex, portMAX_DELAY) == pdTRUE)
     {
@@ -98,7 +103,8 @@ void Camera::update()
 
     canvas.pushImage(0, 0, fb->width, fb->height, (uint16_t *)fb->buf);
 
-    face_detect(fb);
+    faceDetect(fb);
+
     if(_config.show_camera) canvas.pushSprite(&M5.Display, 0, 0);
 
     if (xSemaphoreTake(mutex, portMAX_DELAY) == pdTRUE)
@@ -107,7 +113,7 @@ void Camera::update()
             free(jpg_buf);
             jpg_buf = NULL;
         }
-        get_jpeg_frame(&jpg_buf, &jpg_buf_len);
+        getJpegFrame(&jpg_buf, &jpg_buf_len);
         xSemaphoreGive(mutex);
     }
 
