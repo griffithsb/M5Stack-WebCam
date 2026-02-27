@@ -10,7 +10,6 @@
 //
 // frameType must match the ESP32 camera framesize_t enum ordering
 // if you want correct width/height auto-patching.
-// Adapted from https://github.com/s60sc/ESP32-CAM_MJPEG2SD
 
 class AviWriter {
 public:
