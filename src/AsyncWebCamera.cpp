@@ -25,7 +25,7 @@ AsyncJpegStreamResponse::AsyncJpegStreamResponse() {
     m_frameIndex = 0;
 }
 
-bool AsyncJpegStreamResponse::sourceValid() const {
+bool AsyncJpegStreamResponse::sourceValid() {
     return true;
 }
 

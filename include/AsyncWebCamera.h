@@ -20,6 +20,6 @@ private:
 public:
     AsyncJpegStreamResponse();
 
-    bool sourceValid() const override;
-    size_t fillBuffer(uint8_t *buf, size_t maxLen) override;
+    bool sourceValid();
+    size_t fillBuffer(uint8_t *buf, size_t maxLen);
 };
