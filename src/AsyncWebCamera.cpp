@@ -51,6 +51,7 @@ size_t AsyncJpegStreamResponse::_content(uint8_t *buffer, size_t maxLen, size_t 
         if (maxLen < (strlen(STREAM_BOUNDARY) +
                       strlen(STREAM_PART) +
                       strlen(JPG_CONTENT_TYPE) + 8)) {
+            M5_LOGE("RESPONSE_TRY_AGAIN");
             return RESPONSE_TRY_AGAIN;
         }
 
@@ -79,6 +80,8 @@ size_t AsyncJpegStreamResponse::_content(uint8_t *buffer, size_t maxLen, size_t 
 
         memcpy(buffer, m_jpgBufCopy, hlen);
         m_frameIndex += hlen;
+
+                    M5_LOGE("%d", maxLen);
 
         return maxLen;
     }

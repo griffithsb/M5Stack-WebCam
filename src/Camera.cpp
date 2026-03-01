@@ -5,8 +5,6 @@ Camera& Camera::getInstance() {
     return instance;
 }
 
-const int OFFSET_FOR_RECORD_INDICATOR = 20;
-
 Camera::Camera(): m_display(), m_canvas(&m_display), m_config(Config::getInstance()), face_detector(0.2f, 0.3f, 2, 0.3f) {}
 
 void Camera::setup()
@@ -90,7 +88,7 @@ void Camera::getJpegFrameCopy(uint8_t *jpg_buf_copy, size_t * jpg_len_copy)
 {
     if (xSemaphoreTake(m_mutex, portMAX_DELAY) == pdTRUE)
     {
-        memcpy(jpg_buf_copy, m_jpgBug, m_jpgBufLen);
+        memcpy(jpg_buf_copy, m_jpgBuf, m_jpgBufLen);
         *jpg_len_copy = m_jpgBufLen;
         xSemaphoreGive(m_mutex);
     }
@@ -103,18 +101,23 @@ void Camera::update()
     m_canvas.pushImage(0, 0, fb->width, fb->height, (uint16_t *)fb->buf);
 
     faceDetect(fb);
+    
+    esp_camera_fb_return(fb);
+}
 
-    if(m_config.m_showCamera) m_canvas.pushSprite(&M5.Display, 0, OFFSET_FOR_RECORD_INDICATOR);
-
+void Camera::updateCameraJpg()
+{
     if (xSemaphoreTake(m_mutex, portMAX_DELAY) == pdTRUE)
     {
-        if(m_jpgBug != NULL) {
-            free(m_jpgBug);
-            m_jpgBug = NULL;
+        if(m_jpgBuf != NULL) {
+            free(m_jpgBuf);
         }
-        getJpegFrame(&m_jpgBug, &m_jpgBufLen);
+        getJpegFrame(&m_jpgBuf, &m_jpgBufLen);
         xSemaphoreGive(m_mutex);
     }
+}
 
-    esp_camera_fb_return(fb);
+void Camera::updateDisplay()
+{
+    m_canvas.pushSprite(&M5.Display, 0, 0);
 }

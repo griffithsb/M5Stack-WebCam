@@ -126,12 +126,26 @@ void Webcam::update()
 {
     m_camera.update();
 
+    if(m_config.m_record && m_config.m_recordIcon && m_recording) {
+        updateRecIndicator();
+    }
+
+    m_camera.updateCameraJpg();
+
     if(m_config.m_record) {
-        updateRecording();
+        updateRecordingStatus();
+    }
+
+    if(m_config.m_showCamera) {
+        m_camera.updateDisplay();
+    }
+
+    if(m_config.m_record && m_recording) {
+        m_aviWriter.addJpegFrame(m_camera.m_jpgBuf, m_camera.m_jpgBufLen);
     }
 }
 
-void Webcam::updateRecording()
+void Webcam::updateRecordingStatus()
 {
     const uint32_t START_DELAY_MS = 250;
 
@@ -164,8 +178,6 @@ void Webcam::updateRecording()
 
     // STOP recording when no faces
     if (m_recording) {
-        if(m_config.m_recordIcon) updateRecIndicator();
-
         if (m_camera.m_faceCnt == 0) {
             if (m_noFacesStart == 0)
                 m_noFacesStart = millis();
@@ -178,15 +190,10 @@ void Webcam::updateRecording()
                 m_facePresentStart = 0;
 
                 if(!m_config.m_showCamera) M5.Lcd.setBrightness(0);
-                M5.Display.setCursor(0,0);
-                M5.Display.print(" ");
-                return;
             }
         } else {
             m_noFacesStart = 0;
         }
-
-        m_aviWriter.addJpegFrame(m_camera.m_jpgBug, m_camera.m_jpgBufLen);
     }
 }
 
@@ -204,7 +211,9 @@ void Webcam::updateRecIndicator()
         M5.Display.setCursor(0,0);
         M5.Display.print("R");
     } else {
-        M5.Display.setCursor(0,0);
-        M5.Display.print(" ");
+        if(!m_config.m_showCamera) {
+            M5.Display.setCursor(0,0);
+            M5.Display.print(" ");
+        }
     }
 }

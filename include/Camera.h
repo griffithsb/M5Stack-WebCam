@@ -14,11 +14,12 @@ public:
     int m_faceCnt = 0;
     void setup();
     void faceDetect(camera_fb_t *fb);
-
+    void updateDisplay();
+    void updateCameraJpg();
     void getJpegFrameCopy(uint8_t *jpg_buf_copy, size_t *jpg_len_copy);
     void update();
     size_t m_jpgBufLen;
-    uint8_t *m_jpgBug = NULL;
+    uint8_t *m_jpgBuf = NULL;
 
 private:
     Camera();

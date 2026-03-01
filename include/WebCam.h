@@ -22,7 +22,7 @@ public:
 private:
     void setupWiFi();
     void setupServer();
-    void updateRecording();
+    void updateRecordingStatus();
     void updateRecIndicator();
 
     static void handleStream(AsyncWebServerRequest *request);
