@@ -44,7 +44,7 @@ void Camera::setup()
     esp_camera_init(&_camera_config);
     m_display.begin();
     m_canvas.createSprite(320, 240); //FRAMESIZE_QVGA // 320 x 240.
-    m_canvas.setColor(TFT_GREEN);
+
     m_mutex = xSemaphoreCreateMutex();
 
     sensor_t* s = esp_camera_sensor_get();
@@ -67,6 +67,7 @@ void Camera::faceDetect(camera_fb_t * fb)
             y = (int)prediction->box[1];
             w = (int)prediction->box[2] - x + 1;
             h = (int)prediction->box[3] - y + 1;
+            m_canvas.setColor(TFT_GREEN);
             m_canvas.drawRect(x, y, w, h);
         }
 }

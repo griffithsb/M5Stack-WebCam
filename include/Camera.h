@@ -20,6 +20,7 @@ public:
     void update();
     size_t m_jpgBufLen;
     uint8_t *m_jpgBuf = NULL;
+    M5Canvas m_canvas;
 
 private:
     Camera();
@@ -27,7 +28,6 @@ private:
     bool getJpegFrame(uint8_t **jpg_buf, size_t *jpg_len);
     SemaphoreHandle_t m_mutex;
     M5GFX m_display;
-    M5Canvas m_canvas;
     Config& m_config;
     camera_fb_t* m_fb;
 };

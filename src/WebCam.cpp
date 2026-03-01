@@ -42,6 +42,8 @@ void Webcam::begin()
     M5.Display.clear(TFT_BLACK);
     if(!m_config.m_showCamera) M5.Lcd.setBrightness(0);
     M5.Display.setTextColor(TFT_RED, TFT_BLACK);
+    m_camera.m_canvas.setTextSize(2);
+    m_camera.m_canvas.setTextColor(TFT_RED, TFT_BLACK);
 }
 
 void Webcam::setupWiFi()
@@ -207,13 +209,19 @@ void Webcam::updateRecIndicator()
         visible = !visible;
     }
 
-    if (visible) {
-        M5.Display.setCursor(0,0);
-        M5.Display.print("R");
+    if(m_config.m_showCamera) {
+        if (visible) {
+            m_camera.m_canvas.setCursor(0,0);
+            m_camera.m_canvas.print("R");
+        }  
     } else {
-        if(!m_config.m_showCamera) {
+        if (visible) {
+            M5.Display.setCursor(0,0);
+            M5.Display.print("R");
+        } else {
             M5.Display.setCursor(0,0);
             M5.Display.print(" ");
         }
     }
+
 }
