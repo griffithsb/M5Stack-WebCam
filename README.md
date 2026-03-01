@@ -67,7 +67,6 @@ Create a file named `config.json` with the following content:
     "face_timeout_s": 10
 }
 ```
-
 **Where:**
 
 - `ssid`, `password` — Your WiFi credentials.
@@ -76,6 +75,8 @@ Create a file named `config.json` with the following content:
 - `record_icon` — Displays a recording indicator on the screen.
 - `show_camera` — Mirrors the live camera feed to the device display.
 - `face_timeout_s` — Number of seconds to continue recording after face detection stops.
+
+**ℹ️ NOTE: The file manager is disabled if `show_camera` is enabled**
 
 ---
 
@@ -154,7 +155,9 @@ to access the live stream, or:
 http://<device-ip>/file
 ```
 
-to manage files on the SD card
+to manage files on the SD card.
+
+**ℹ️ NOTE: The file manager is disabled if `show_camera` is enabled**
 
 If WiFi credentials are empty, the device will run in standalone mode (no web interface).
 

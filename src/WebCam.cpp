@@ -84,8 +84,14 @@ void Webcam::setupWiFi()
 
 void Webcam::setupServer()
 {
-    m_fileManager.initSDCard(&SD, SD_SPI_CS_PIN);
-    m_fileManager.setServer(&m_server);
+    // There's too much SPI contention between the ESPFileManager
+    // and the display. This is probably solvable by mutexing the
+    // two services, but for this project we'll stop both running
+    // at the same time.
+    if(!m_config.m_showCamera) {
+        m_fileManager.initSDCard(&SD, SD_SPI_CS_PIN);
+        m_fileManager.setServer(&m_server);
+    }
 
     m_server.on("/", HTTP_GET, handleIndex);
     m_server.on("/stream", HTTP_GET, handleStream);
@@ -223,5 +229,4 @@ void Webcam::updateRecIndicator()
             M5.Display.print(" ");
         }
     }
-
 }
