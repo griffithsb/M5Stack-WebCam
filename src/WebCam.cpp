@@ -94,6 +94,7 @@ void Webcam::setupServer()
 void Webcam::handleStream(AsyncWebServerRequest *request)
 {
     AsyncJpegStreamResponse *response = new AsyncJpegStreamResponse();
+
     if(!response){
         request->send(501);
         return;
@@ -118,7 +119,6 @@ void Webcam::handleIndex(AsyncWebServerRequest *request)
         "<img src=\"/stream\">"
         "</body>"
         "</html>";
-
     request->send(200, "text/html", html);
 }
 

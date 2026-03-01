@@ -11,7 +11,6 @@ static const char* STREAM_PART =
 
 static const char * JPG_CONTENT_TYPE = "image/jpeg";
 
-
 AsyncJpegStreamResponse::AsyncJpegStreamResponse() {
     _callback = nullptr;
     _code = 200;
@@ -25,11 +24,11 @@ AsyncJpegStreamResponse::AsyncJpegStreamResponse() {
     m_frameIndex = 0;
 }
 
-bool AsyncJpegStreamResponse::sourceValid() {
+bool AsyncJpegStreamResponse::_sourceValid() const {
     return true;
 }
 
-size_t AsyncJpegStreamResponse::fillBuffer(uint8_t *buf, size_t maxLen) {
+size_t AsyncJpegStreamResponse::_fillBuffer(uint8_t *buf, size_t maxLen) {
     size_t ret = _content(buf, maxLen, m_index);
     if (ret != RESPONSE_TRY_AGAIN) {
         m_index += ret;
@@ -39,7 +38,6 @@ size_t AsyncJpegStreamResponse::fillBuffer(uint8_t *buf, size_t maxLen) {
 
 size_t AsyncJpegStreamResponse::_content(uint8_t *buffer, size_t maxLen, size_t index) {
     Camera& camera = Camera::getInstance();
-
     if (m_first || m_frameIndex == m_jpgLenCopy) {
         m_first = false;
 
@@ -51,13 +49,15 @@ size_t AsyncJpegStreamResponse::_content(uint8_t *buffer, size_t maxLen, size_t 
         if (maxLen < (strlen(STREAM_BOUNDARY) +
                       strlen(STREAM_PART) +
                       strlen(JPG_CONTENT_TYPE) + 8)) {
-            M5_LOGE("RESPONSE_TRY_AGAIN");
             return RESPONSE_TRY_AGAIN;
         }
 
         m_frameIndex = 0;
         camera.getJpegFrameCopy(m_jpgBufCopy, &m_jpgLenCopy);
-
+        if (m_jpgLenCopy > sizeof(m_jpgBufCopy)) {
+            M5_LOGE("JPEG too large: %u > %u", (unsigned)m_jpgLenCopy, (unsigned)sizeof(m_jpgBufCopy));
+            m_jpgLenCopy = sizeof(m_jpgBufCopy); // or return an error / drop frame
+        }
         // Send boundary
         size_t blen = 0;
         if (index) {
@@ -80,8 +80,6 @@ size_t AsyncJpegStreamResponse::_content(uint8_t *buffer, size_t maxLen, size_t 
 
         memcpy(buffer, m_jpgBufCopy, hlen);
         m_frameIndex += hlen;
-
-                    M5_LOGE("%d", maxLen);
 
         return maxLen;
     }

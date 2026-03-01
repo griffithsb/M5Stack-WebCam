@@ -96,13 +96,13 @@ void Camera::getJpegFrameCopy(uint8_t *jpg_buf_copy, size_t * jpg_len_copy)
 
 void Camera::update()
 {
-    camera_fb_t* fb = esp_camera_fb_get();
+    m_fb = esp_camera_fb_get();
 
-    m_canvas.pushImage(0, 0, fb->width, fb->height, (uint16_t *)fb->buf);
+    m_canvas.pushImage(0, 0, m_fb->width, m_fb->height, (uint16_t *)m_fb->buf);
 
-    faceDetect(fb);
+    faceDetect(m_fb);
     
-    esp_camera_fb_return(fb);
+    esp_camera_fb_return(m_fb);
 }
 
 void Camera::updateCameraJpg()

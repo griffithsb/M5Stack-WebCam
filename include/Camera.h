@@ -29,4 +29,5 @@ private:
     M5GFX m_display;
     M5Canvas m_canvas;
     Config& m_config;
+    camera_fb_t* m_fb;
 };
